@@ -2,17 +2,17 @@ package org.example.onlineaudiobook.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.example.onlineaudiobook.entity.enums.BookType;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Audio {
+public class BookCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
     private Long id;
     private String name;
-    private byte[] content;
 }
