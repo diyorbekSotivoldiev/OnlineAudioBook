@@ -28,12 +28,12 @@ public class Security {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, Filter filter) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable);
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(SWAGGER_URLS).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/register/**").permitAll()
                         .anyRequest().authenticated()
                 );
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);

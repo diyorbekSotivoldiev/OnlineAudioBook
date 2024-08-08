@@ -23,13 +23,12 @@ public class User implements Serializable, UserDetails {
 
     @Column(nullable = false)
     private String email;
-    @Column(nullable = false)
+
     private String displayName;
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String username;
     @Column(unique = true, nullable = false)
     private String password;
-    @Column(nullable = false)
     private String phone;
     @Column(nullable = false)
     private LocalDate birthDate;
@@ -37,8 +36,15 @@ public class User implements Serializable, UserDetails {
     @OneToOne(cascade = CascadeType.ALL)
     private Image image;
 
+    private boolean active;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return active;
     }
 }

@@ -21,7 +21,7 @@ public class Book {
     private String bookName;
     private String authorName;
     @CreatedDate
-    private LocalDateTime localDateTime;
+    private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
     private BookType type;
@@ -37,4 +37,6 @@ public class Book {
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private PdfBook pdfBook;
+
+    private boolean active;
 }
