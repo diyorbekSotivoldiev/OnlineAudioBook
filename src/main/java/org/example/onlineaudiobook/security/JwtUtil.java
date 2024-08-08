@@ -16,9 +16,6 @@ import java.util.stream.Collectors;
 public class JwtUtil {
 
     public String generateToken(UserDetails userDetails) {
-        String roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
         return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date())
@@ -27,9 +24,6 @@ public class JwtUtil {
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
-        String roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
         return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date())

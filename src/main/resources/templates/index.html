@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Book</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group input[type="file"] {
+            padding: 0;
+        }
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            background-color: #5cb85c;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #4cae4c;
+        }
+        .error {
+            color: red;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Create Book</h1>
+    <form id="bookForm" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="bookName">Book Name:</label>
+            <input type="text" id="bookName" name="bookName" required>
+        </div>
+        <div class="form-group">
+            <label for="authorName">Author Name:</label>
+            <input type="text" id="authorName" name="authorName" required>
+        </div>
+        <div class="form-group">
+            <label for="type">Book Type:</label>
+            <input type="text" id="type" name="type" required>
+        </div>
+        <div class="form-group">
+            <label for="bookCategoryId">Book Category ID:</label>
+            <input type="text" id="bookCategoryId" name="bookCategoryId" required>
+        </div>
+        <div class="form-group">
+            <label for="audioFile">Audio File:</label>
+            <input type="file" id="audioFile" name="audioFile">
+        </div>
+        <div class="form-group">
+            <label for="pdfBookFile">PDF Book File:</label>
+            <input type="file" id="pdfBookFile" name="pdfBookFile">
+        </div>
+        <div class="form-group">
+            <button type="submit">Save Book</button>
+        </div>
+        <div class="error" id="errorMessage"></div>
+    </form>
+</div>
+<script>
+    localStorage.setItem("token", "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJkaXlvcmJlayIsImlhdCI6MTcyMzEyNzU2MCwiZXhwIjoxNzIzMTI4NDYwfQ.t65JRaVVFXJvs75hUonphrsxCkRlz0FcJ3u1iir8nW3JyC_b88MrMtbqYLeici1j")
+    document.getElementById('bookForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch('http://localhost:8081/api/book/create', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const book = await response.json();
+                alert('Book created successfully: ' + JSON.stringify(book));
+            } else {
+                const errorMessage = await response.text();
+                document.getElementById('errorMessage').innerText = 'Error: ' + errorMessage;
+            }
+        } catch (error) {
+            document.getElementById('errorMessage').innerText = 'Error: ' + error.message;
+        }
+    });
+</script>
+</body>
+</html>
