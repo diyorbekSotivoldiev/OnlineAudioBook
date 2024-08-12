@@ -1,7 +1,6 @@
 package org.example.onlineaudiobook.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -21,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,26 +34,20 @@ public class BookService {
     private final PdfBookRepository pdfBookRepository;
     private final BookCategoryRepository bookCategoryRepository;
 
-    public byte[] getFirstPageAsByteArray(long pdfBookId) {
-        Optional<Book> bookOptional = bookRepository.findById(pdfBookId);
+    public String convertFirstPageToImage(Long bookId) throws IOException {
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("Book not found"));
+        byte[] pdfBytes = book.getPdfBook().getContent();
 
-        if (bookOptional.isPresent()) {
-            byte[] pdfBytes = bookOptional.get().getPdfBook().getContent();
+        try (PDDocument document = PDDocument.load(new ByteArrayInputStream(pdfBytes))) {
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
+            BufferedImage bufferedImage = pdfRenderer.renderImageWithDPI(0, 300); // 0 - 1-chi sahifa
 
-            try (PDDocument document = PDDocument.load(new ByteArrayInputStream(pdfBytes))) {
-                if (document.getNumberOfPages() > 0) {
-                    PDFRenderer pdfRenderer = new PDFRenderer(document);
-                    BufferedImage bufferedImage = pdfRenderer.renderImageWithDPI(0, 300, ImageType.RGB);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(bufferedImage, "png", baos);
+            byte[] imageBytes = baos.toByteArray();
 
-                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                    ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
-                    return byteArrayOutputStream.toByteArray();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            return Base64.getEncoder().encodeToString(imageBytes); // Base64 formatda rasmni qaytarish
         }
-        return null;
     }
 
     @Transactional(readOnly = true)
@@ -93,7 +87,8 @@ public class BookService {
                 .build();
     }
 
-    public Book saveBook(BookSaveRequest bookSaveRequest, MultipartFile audioFile, MultipartFile pdfBookFile) throws IOException {
+    /*public Book saveBook(BookSaveRequest bookSaveRequest, MultipartFile audioFile, MultipartFile pdfBookFile) throws IOException {
+
         BookCategory bookCategory = bookCategoryRepository.findById(bookSaveRequest.getBookCategoryId()).orElseThrow(() -> new RuntimeException("BookCategory not found"));
 
         Audio audio = null;
@@ -128,6 +123,53 @@ public class BookService {
                 .build();
 
         return bookRepository.save(book);
+    }*/
+
+
+
+
+    public Book saveBook(String bookName, String authorName, String type, Long bookCategoryId, byte[] audioData, byte[] pdfData) {
+        BookSaveRequest bookSaveRequest = new BookSaveRequest(bookName, authorName, type, bookCategoryId);
+        BookCategory bookCategory = bookCategoryRepository.findById(bookSaveRequest.getBookCategoryId()).orElseThrow(() -> new RuntimeException("BookCategory not found"));
+
+        Audio audio = null;
+        if (audioData != null && audioData.length!=0) {
+            audio = Audio
+                    .builder()
+                    .name(bookSaveRequest.getBookName())
+                    .content(audioData)
+                    .build();
+            audioRepository.save(audio);
+        }
+
+        PdfBook pdfBook = null;
+        if (pdfData != null && pdfData.length!=0) {
+            pdfBook = PdfBook
+                    .builder()
+                    .content(pdfData)
+                    .build();
+            pdfBookRepository.save(pdfBook);
+        }
+
+        Book book = Book.builder()
+                .bookName(bookSaveRequest.getBookName())
+                .authorName(bookSaveRequest.getAuthorName())
+                .type(BookType.valueOf(bookSaveRequest.getType()))
+                .bookCategory(bookCategory)
+                .audio(audio)
+                .pdfBook(pdfBook)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        return bookRepository.save(book);
     }
+
+    public byte[] getPdfOfBook(Long id) {
+        return bookRepository.findById(id).get().getPdfBook().getContent();
     }
+
+    public byte[] getAudioByBookId(Long bookId) {
+        return bookRepository.findById(bookId).get().getAudio().getContent();
+    }
+}
 

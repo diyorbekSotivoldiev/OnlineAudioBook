@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF to Image</title>
+    <style>
+        #image-container {
+            margin-top: 20px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<h1>Convert PDF to Image</h1>
+<form id="upload-form">
+    <input type="number" id="book-id-input" placeholder="Enter Book ID" />
+    <button type="button" onclick="convertPdf()">Convert</button>
+</form>
+
+<div id="image-container">
+    <!-- Converted image will be displayed here -->
+    <img id="converted-image" src="" alt="Converted Image" />
+</div>
+
+<script>
+    function convertPdf() {
+        const bookId = document.getElementById('book-id-input').value;
+
+        fetch(`http://localhost:8081/api/pdf/convert/${bookId}`, {
+            method: 'GET'
+        })
+            .then(response => response.text())
+            .then(data => {
+                // Set the src attribute of the image to the Base64 encoded image data
+                const imgElement = document.getElementById('converted-image');
+                imgElement.src = 'data:image/png;base64,' + data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+</script>
+</body>
+</html>

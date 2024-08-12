@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Play Audio</title>
+</head>
+<body>
+<h1>Play Audio from Database</h1>
+<form id="audio-form">
+    <input type="number" id="book-id-input" placeholder="Enter Book ID" />
+    <button type="button" onclick="playAudio()">Play</button>
+</form>
+
+<audio id="audio-player" controls>
+    <source id="audio-source" src="" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<script>
+    function playAudio() {
+        const bookId = document.getElementById('book-id-input').value;
+
+        fetch(`http://localhost:8081/api/book/audio/play/1`)
+            .then(response => response.blob())
+            .then(blob => {
+                const audioUrl = URL.createObjectURL(blob);
+                const audioSource = document.getElementById('audio-source');
+                audioSource.src = audioUrl;
+
+                const audioPlayer = document.getElementById('audio-player');
+                audioPlayer.load();
+                audioPlayer.play();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+</script>
+</body>
+</html>

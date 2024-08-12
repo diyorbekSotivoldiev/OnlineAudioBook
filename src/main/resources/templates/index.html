@@ -1,7 +1,7 @@
+<!--
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Book</title>
     <style>
@@ -104,7 +104,7 @@
     </form>
 </div>
 <script>
-    localStorage.setItem("token", "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJkaXlvcmJlayIsImlhdCI6MTcyMzEyNzU2MCwiZXhwIjoxNzIzMTI4NDYwfQ.t65JRaVVFXJvs75hUonphrsxCkRlz0FcJ3u1iir8nW3JyC_b88MrMtbqYLeici1j")
+    localStorage.setItem("token", "lmgkgsgdfgdfg")
     document.getElementById('bookForm').addEventListener('submit', async function (event) {
         event.preventDefault();
 
@@ -134,3 +134,126 @@
 </script>
 </body>
 </html>
+-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Book</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 50%;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-group button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .form-group button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Add Book</h2>
+    <form id="bookForm" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="bookName">Book Name</label>
+            <input type="text" id="bookName" name="bookName" required>
+        </div>
+        <div class="form-group">
+            <label for="authorName">Author Name</label>
+            <input type="text" id="authorName" name="authorName" required>
+        </div>
+        <div class="form-group">
+            <label for="type">Type</label>
+            <input type="text" id="type" name="type" required>
+        </div>
+        <div class="form-group">
+            <label for="bookCategoryId">Book Category ID</label>
+            <input type="number" id="bookCategoryId" name="bookCategoryId" required>
+        </div>
+        <div class="form-group">
+            <label for="audioFile">Audio File</label>
+            <input type="file" id="audioFile" name="audioFile" accept="audio/*" required>
+        </div>
+        <div class="form-group">
+            <label for="pdfBookFile">PDF Book File</label>
+            <input type="file" id="pdfBookFile" name="pdfBookFile" accept="application/pdf" required>
+        </div>
+        <div class="form-group">
+            <button type="submit">Save Book</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('bookForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append('bookName', document.getElementById('bookName').value);
+        formData.append('authorName', document.getElementById('authorName').value);
+        formData.append('type', document.getElementById('type').value);
+        formData.append('bookCategoryId', document.getElementById('bookCategoryId').value);
+        formData.append('audioFile', document.getElementById('audioFile').files[0]);
+        formData.append('pdfBookFile', document.getElementById('pdfBookFile').files[0]);
+
+        fetch('http://localhost:8081/api/book/create', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Network response was not ok.');
+                }
+            })
+            .then(data => {
+                alert('Book saved successfully!');
+                console.log(data);
+            })
+            .catch(error => {
+                alert('There was a problem with your request: ' + error.message);
+            });
+    });
+</script>
+
+</body>
+</html>
+
