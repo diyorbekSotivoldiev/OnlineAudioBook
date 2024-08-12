@@ -4,6 +4,7 @@ import io.jsonwebtoken.io.CodecException;
 import lombok.RequiredArgsConstructor;
 import org.example.onlineaudiobook.entity.CodesMail;
 import org.example.onlineaudiobook.entity.User;
+import org.example.onlineaudiobook.handler.exceptions.AlreadyExist;
 import org.example.onlineaudiobook.handler.exceptions.PasswordMismatchException;
 import org.example.onlineaudiobook.repository.CodesMailRepository;
 import org.example.onlineaudiobook.requestDto.MailCodeDTO;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -20,13 +23,35 @@ public class UserService {
     private final UserRepository userRepository;
     private final EmailService emailService;
     private final CodesMailRepository codesMailRepository;
+    private static final String EMAIL_REGEX = "^[\\w-\\.]+@[\\w-]+\\.[a-z]{2,}$";
+
+
+    public static boolean isValidEmail(String email) {
+        Pattern pattern = Pattern.compile(EMAIL_REGEX, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
 
     public User checkConfirmPasswordAndSendEmail(RegisterDto registerDto) {
         if (registerDto.password().equals(registerDto.confirmPassword())) {
+            if (!isValidEmail(registerDto.email()))
+                throw new RuntimeException("email xato kiritildi");
+            if (userRepository.existsByEmail(registerDto.email()))
+                throw new AlreadyExist("user EMAIL already exist");
+            if (userRepository.existsByPhone(registerDto.phone()))
+                throw new AlreadyExist("user PHONE already exist");
+            if (userRepository.existsByUsername(registerDto.username()))
+                throw new AlreadyExist("user USERNAME already exist");
+
             String code = String.valueOf(ThreadLocalRandom.current().nextInt(1000, 10000));
-            System.out.println("gmail code: " + code);
             emailService.sendSimpleEmail(registerDto.email(), "Ushbu kodni hech kimga bermang", code);
-            User save = userRepository.save(User.builder().password(registerDto.password()).birthDate(registerDto.dateOfBirth()).email(registerDto.email()).build());
+            User save = userRepository.save(User.builder()
+                    .username(registerDto.username())
+                    .displayName(registerDto.displayName())
+                    .phone(registerDto.phone())
+                    .password(registerDto.password())
+                    .birthDate(registerDto.dateOfBirth())
+                    .email(registerDto.email()).build());
             codesMailRepository.deleteAllByUserId(save.getId());
             codesMailRepository.save(new CodesMail(save, code));
             return save;
@@ -39,7 +64,6 @@ public class UserService {
     public User saveActiveUser(MailCodeDTO mailCodeDTO) {
         User user = userRepository.findById(mailCodeDTO.userId()).orElseThrow(() -> new RuntimeException("userNotfound"));
         CodesMail codesMail = codesMailRepository.findByUserId(mailCodeDTO.userId()).orElseThrow(() -> new RuntimeException("invalid code"));
-        System.out.println(codesMail.getCode() + "  " + mailCodeDTO.code());
         if (codesMail.getCode().equals(mailCodeDTO.code())) {
             user.setActive(true);
             User save = userRepository.save(user);

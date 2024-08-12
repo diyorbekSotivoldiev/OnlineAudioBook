@@ -11,25 +11,30 @@
             margin: 0;
             padding: 20px;
         }
+
         .container {
             max-width: 600px;
             margin: auto;
             padding: 20px;
             background-color: #fff;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
             text-align: center;
             margin-bottom: 20px;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 5px;
         }
+
         .form-group input[type="text"],
         .form-group input[type="file"] {
             width: 100%;
@@ -38,9 +43,11 @@
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+
         .form-group input[type="file"] {
             padding: 0;
         }
+
         .form-group button {
             width: 100%;
             padding: 10px;
@@ -51,9 +58,11 @@
             font-size: 16px;
             cursor: pointer;
         }
+
         .form-group button:hover {
             background-color: #4cae4c;
         }
+
         .error {
             color: red;
             text-align: center;
@@ -96,7 +105,7 @@
 </div>
 <script>
     localStorage.setItem("token", "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJkaXlvcmJlayIsImlhdCI6MTcyMzEyNzU2MCwiZXhwIjoxNzIzMTI4NDYwfQ.t65JRaVVFXJvs75hUonphrsxCkRlz0FcJ3u1iir8nW3JyC_b88MrMtbqYLeici1j")
-    document.getElementById('bookForm').addEventListener('submit', async function(event) {
+    document.getElementById('bookForm').addEventListener('submit', async function (event) {
         event.preventDefault();
 
         const formData = new FormData(this);

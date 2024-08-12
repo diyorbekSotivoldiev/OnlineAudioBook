@@ -1,5 +1,6 @@
 package org.example.onlineaudiobook.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,15 +22,20 @@ public class User implements Serializable, UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
     private String displayName;
-    @Column(unique = true)
-    private String username;
     @Column(unique = true, nullable = false)
+    private String username;
+
+    @Column(nullable = false)
+    @JsonIgnore
     private String password;
+
+    @Column(unique = true, nullable = false)
     private String phone;
+
     @Column(nullable = false)
     private LocalDate birthDate;
 
