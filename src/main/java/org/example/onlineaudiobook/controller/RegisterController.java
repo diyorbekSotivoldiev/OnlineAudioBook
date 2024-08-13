@@ -37,6 +37,6 @@ public class RegisterController {
     @PostMapping("/resendMail")
     public ResponseEntity<?> saveActiveUser(@RequestParam Long userId, @RequestParam String email) {
         userService.resendEmail(userId, email);
-        return ResponseEntity.ok("kod yuborildi✔");
+        return ResponseEntity.ok(email+"ga kod yuborildi✔");
     }
 }

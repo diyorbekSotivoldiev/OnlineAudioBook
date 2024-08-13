@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.onlineaudiobook.entity.enums.BookType;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class BookSaveRequest {
     private String bookName;
     private String authorName;
-    private String type;
+    private BookType type;
     private Long bookCategoryId;
 }

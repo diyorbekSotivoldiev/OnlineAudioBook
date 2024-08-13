@@ -1,28 +1,26 @@
 package org.example.onlineaudiobook.service;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.ImageType;
-import org.apache.pdfbox.rendering.PDFRenderer;
 import org.example.onlineaudiobook.entity.*;
 import org.example.onlineaudiobook.entity.enums.BookType;
 import org.example.onlineaudiobook.repository.*;
 import org.example.onlineaudiobook.requestDto.BookSaveRequest;
 import org.example.onlineaudiobook.responseDto.BookResponseDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,22 +31,11 @@ public class BookService {
     private final AudioRepository audioRepository;
     private final PdfBookRepository pdfBookRepository;
     private final BookCategoryRepository bookCategoryRepository;
+    @Value("${server.url}")
+    String serverUrl;
+    @Value("${file.basePath}")
+    String fileBasePath;
 
-    public String convertFirstPageToImage(Long bookId) throws IOException {
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("Book not found"));
-        byte[] pdfBytes = book.getPdfBook().getContent();
-
-        try (PDDocument document = PDDocument.load(new ByteArrayInputStream(pdfBytes))) {
-            PDFRenderer pdfRenderer = new PDFRenderer(document);
-            BufferedImage bufferedImage = pdfRenderer.renderImageWithDPI(0, 300); // 0 - 1-chi sahifa
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(bufferedImage, "png", baos);
-            byte[] imageBytes = baos.toByteArray();
-
-            return Base64.getEncoder().encodeToString(imageBytes); // Base64 formatda rasmni qaytarish
-        }
-    }
 
     @Transactional(readOnly = true)
     public List<BookResponseDTO> getAllBooks() {
@@ -78,6 +65,7 @@ public class BookService {
     private BookResponseDTO convertToDto(Book book) {
         return BookResponseDTO
                 .builder()
+                .id(book.getId())
                 .name(book.getBookName())
                 .author(book.getAuthorName())
                 .bookType(book.getType())
@@ -87,66 +75,31 @@ public class BookService {
                 .build();
     }
 
-    /*public Book saveBook(BookSaveRequest bookSaveRequest, MultipartFile audioFile, MultipartFile pdfBookFile) throws IOException {
-
-        BookCategory bookCategory = bookCategoryRepository.findById(bookSaveRequest.getBookCategoryId()).orElseThrow(() -> new RuntimeException("BookCategory not found"));
-
-        Audio audio = null;
-        if (audioFile != null && !audioFile.isEmpty()) {
-            byte[] audioData = audioFile.getBytes();
-            audio = Audio
-                    .builder()
-                    .name(bookSaveRequest.getBookName())
-                    .content(audioData)
-                    .build();
-            audioRepository.save(audio);
-        }
-
-        PdfBook pdfBook = null;
-        if (pdfBookFile != null && !pdfBookFile.isEmpty()) {
-            byte[] pdfBookData = pdfBookFile.getBytes();
-            pdfBook = PdfBook
-                    .builder()
-                    .content(pdfBookData)
-                    .build();
-            pdfBookRepository.save(pdfBook);
-        }
-
-        Book book = Book.builder()
-                .bookName(bookSaveRequest.getBookName())
-                .authorName(bookSaveRequest.getAuthorName())
-                .type(BookType.valueOf(bookSaveRequest.getType()))
-                .bookCategory(bookCategory)
-                .audio(audio)
-                .pdfBook(pdfBook)
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        return bookRepository.save(book);
-    }*/
-
-
-
-
-    public Book saveBook(String bookName, String authorName, String type, Long bookCategoryId, byte[] audioData, byte[] pdfData) {
+    @Transactional
+    public Book saveBook(String bookName, String authorName, BookType type, Long bookCategoryId, @NotNull MultipartFile audioData, @NotNull MultipartFile pdfData) throws IOException {
         BookSaveRequest bookSaveRequest = new BookSaveRequest(bookName, authorName, type, bookCategoryId);
         BookCategory bookCategory = bookCategoryRepository.findById(bookSaveRequest.getBookCategoryId()).orElseThrow(() -> new RuntimeException("BookCategory not found"));
 
         Audio audio = null;
-        if (audioData != null && audioData.length!=0) {
+        if (audioData != null && audioData.getInputStream().readAllBytes().length != 0) {
+            Result result = saveFile(audioData, "audioFile", serverUrl + "api/audio/findByFileName/");
+
             audio = Audio
                     .builder()
                     .name(bookSaveRequest.getBookName())
-                    .content(audioData)
+                    .fileName(result.fileName())
+                    .url(result.objUrl())
                     .build();
             audioRepository.save(audio);
         }
 
         PdfBook pdfBook = null;
-        if (pdfData != null && pdfData.length!=0) {
+        if (pdfData != null && pdfData.getInputStream().readAllBytes().length != 0) {
+            Result result = saveFile(pdfData, "pdfBookFile", serverUrl + "api/pdfBook/findByFileName/");
             pdfBook = PdfBook
                     .builder()
-                    .content(pdfData)
+                    .fileName(result.fileName)
+                    .url(result.objUrl)
                     .build();
             pdfBookRepository.save(pdfBook);
         }
@@ -154,22 +107,54 @@ public class BookService {
         Book book = Book.builder()
                 .bookName(bookSaveRequest.getBookName())
                 .authorName(bookSaveRequest.getAuthorName())
-                .type(BookType.valueOf(bookSaveRequest.getType()))
+                .type(type)
                 .bookCategory(bookCategory)
                 .audio(audio)
                 .pdfBook(pdfBook)
                 .createdAt(LocalDateTime.now())
                 .build();
-
         return bookRepository.save(book);
     }
 
-    public byte[] getPdfOfBook(Long id) {
-        return bookRepository.findById(id).get().getPdfBook().getContent();
+    @Transactional
+    public Result saveFile(MultipartFile audioData, String directoryName, String api) {
+        Path path = Paths.get(fileBasePath + directoryName);
+        try {
+            if (!Files.exists(path)) {
+                Path directories;
+                directories = Files.createDirectories(path);
+                System.out.println("creted now direct: " + directories);
+            }
+            String fileName = UUID.randomUUID() + getFileExtension(audioData);
+            InputStream inputStream = audioData.getInputStream();
+            byte[] bytes = inputStream.readAllBytes();
+            Path path1 = Paths.get(fileBasePath + directoryName + "/" + fileName);
+            Files.write(path1, bytes);
+            String objUrl = api + fileName;
+            return new Result(fileName, objUrl);
+        } catch (IOException e) {
+            throw new RuntimeException("directory yaratilmadi yoki byte[] ga o'girilmadi");
+        }
     }
 
-    public byte[] getAudioByBookId(Long bookId) {
-        return bookRepository.findById(bookId).get().getAudio().getContent();
+    public String getFileExtension(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename != null && originalFilename.contains(".")) {
+            return originalFilename.substring(originalFilename.lastIndexOf("."));
+        } else {
+            throw new RuntimeException("invalid file"); // No extension found
+        }
+    }
+
+    public record Result(String fileName, String objUrl) {
+    }
+
+    public PdfBook getPdfOfBook(Long id) {
+        return bookRepository.findById(id).get().getPdfBook();
+    }
+
+    public Audio getAudioByBookId(Long bookId) {
+        return bookRepository.findById(bookId).get().getAudio();
     }
 }
 

@@ -12,6 +12,7 @@ import org.example.onlineaudiobook.entity.enums.BookType;
 @Data
 @Builder
 public class BookResponseDTO {
+    private Long id;
     private String name;
     private String author;
     private BookType bookType;

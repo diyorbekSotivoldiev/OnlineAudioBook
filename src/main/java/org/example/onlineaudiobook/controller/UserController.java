@@ -19,6 +19,6 @@ public class UserController {
 
     @PostMapping("/logout")
     public HttpEntity<?> logout() {
-        return ResponseEntity.ok("Mani ushbu xabarimni o'qishing bilan tokenni qayerda saqlab qoygan bo'lsang o'chir, shunda logout bo'ladi");
+        return ResponseEntity.ok("Mani ushbu xabarimni o'qishing bilan tokenni qayerda saqlab qoygan bo'lsang o'chir va tokenni berma endi, shunda user logout bo'ladi");
     }
 }
