@@ -11,25 +11,30 @@
             margin: 0;
             padding: 20px;
         }
+
         .container {
             max-width: 400px;
             margin: auto;
             padding: 20px;
             background-color: #fff;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
             text-align: center;
             margin-bottom: 20px;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 5px;
         }
+
         .form-group input[type="text"],
         .form-group input[type="password"] {
             width: 100%;
@@ -38,6 +43,7 @@
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+
         .form-group button {
             width: 100%;
             padding: 10px;
@@ -48,9 +54,11 @@
             font-size: 16px;
             cursor: pointer;
         }
+
         .form-group button:hover {
             background-color: #4cae4c;
         }
+
         .error {
             color: red;
             text-align: center;
@@ -73,12 +81,37 @@
             <button type="submit">Login</button>
         </div>
         <div class="error" id="error-message">
-            <!-- Error message will be displayed here -->
         </div>
     </form>
+    <button id="google">sign with google</button>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
+    function getQueryParams() {
+        const params = new URLSearchParams(window.location.search)
+        return Object.fromEntries(params.entries())
+    }
+
+    const params = getQueryParams();
+    const accessToken = params['accessToken'];
+    const refreshToken = params['refreshToken'];
+    if (accessToken && refreshToken) {
+        localStorage.setItem("accessToken", "Bearer " + accessToken);
+        localStorage.setItem("refreshToken", "Bearer " + refreshToken);
+        window.location.href = "index.html"
+    }
+    document.getElementById('google').addEventListener(
+        'click', () => {
+            axios({
+                url: 'http://localhost:8081/api/auth/oauth2',
+                method: 'GET'
+            }).then(data => {
+                alert(data.data.authorizationUrl);
+                window.location.href = data.data.authorizationUrl;
+            })
+        }
+    )
     document.getElementById('loginForm').addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent default form submission
 
@@ -91,9 +124,8 @@
         }).then(response => {
             if (response.ok) {
                 console.log('success login')
-                window.location.href = '/index.html';
+                window.location.href = 'src/main/resources/templates/index.html';
             } else {
-                // Display error message if login fails
                 document.getElementById('error-message').textContent = 'Invalid username or password.';
             }
         }).catch(error => {

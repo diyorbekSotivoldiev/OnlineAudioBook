@@ -1,0 +1,50 @@
+server:
+    port: 8081
+spring:
+    application:
+        name: OnlineAudioBook
+    datasource:
+        driverClassName: org.postgresql.Driver
+        password: diyorbek
+        url: jdbc:postgresql://localhost:5432/online_audio_book
+        username: postgres
+    jpa:
+        hibernate:
+            ddl-auto: create
+    mail:
+        host: smtp.gmail.com
+        password: ibymzrmqglqafkew
+        port: 587
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    starttls:
+                        enable: true
+        username: oktamovasilbek12@gmail.com
+    main:
+        allow-bean-definition-overriding: true
+    oauth:
+        auth-url: https://accounts.google.com/o/oauth2/v2/auth
+        client-id: 84904511699-cjqrjg9bl4gtpl55sdt00v4o5qi9t9sh.apps.googleusercontent.com
+        redirect-uri: http://localhost:8081/api/auth/oauth2/callback
+        client-secret: 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
+        token-url: https://oauth2.googleapis.com/token
+        user-info-url: https://www.googleapis.com/oauth2/v3/userinfo
+
+
+    servlet:
+        multipart:
+            enabled: true
+            max-file-size: 50MB
+            max-request-size: 50MB
+
+#
+#    security:
+#        oauth2:
+#            client:
+#                registration:
+#                    google:
+#                        client-id: 84904511699-cjqrjg9bl4gtpl55sdt00v4o5qi9t9sh.apps.googleusercontent.com
+#                        client-secret: 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
+##                        redirect-uri: "{baseUrl}/login/oauth2/code/google"

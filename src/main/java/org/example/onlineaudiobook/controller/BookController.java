@@ -39,7 +39,6 @@ public class BookController {
     @GetMapping("/categoryId/{categoryId}")
     public HttpEntity<?> findByCategory(@PathVariable Long categoryId) {
         List<BookResponseDTO> allBooks = bookRepository.findAllByBookCategoryId(categoryId);
-
         return ResponseEntity.ok(allBooks);
     }
 
