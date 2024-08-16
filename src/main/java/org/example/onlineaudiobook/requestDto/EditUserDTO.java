@@ -7,8 +7,8 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 public record EditUserDTO(@NotNull @NotBlank String email,
-                          @NotNull @NotBlank String displayName,
-                          @NotNull @NotBlank String username,
-                          @NotNull @NotBlank String phone,
-                          @NotNull LocalDate birthDate) implements Serializable {
+                          String displayName,
+                          String username,
+                          String phone,
+                          LocalDate birthDate) implements Serializable {
 }

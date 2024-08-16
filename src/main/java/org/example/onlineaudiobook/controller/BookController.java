@@ -2,15 +2,11 @@ package org.example.onlineaudiobook.controller;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.example.onlineaudiobook.entity.Book;
 import org.example.onlineaudiobook.entity.enums.BookType;
 import org.example.onlineaudiobook.repository.BookRepository;
 import org.example.onlineaudiobook.responseDto.BookResponseDTO;
 import org.example.onlineaudiobook.service.BookService;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,9 +22,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class BookController {
     private final BookService bookService;
-    private final BookRepository bookRepository;
 
-    @GetMapping
+    @GetMapping("/getAll")
     public HttpEntity<?> getAllBooks() {
         List<BookResponseDTO> allBooks = bookService.getAllBooks();
 
@@ -38,8 +32,17 @@ public class BookController {
 
     @GetMapping("/categoryId/{categoryId}")
     public HttpEntity<?> findByCategory(@PathVariable Long categoryId) {
-        List<BookResponseDTO> allBooks = bookRepository.findAllByBookCategoryId(categoryId);
-        return ResponseEntity.ok(allBooks);
+        return ResponseEntity.ok(bookService.getByCategoryId(categoryId));
+    }
+
+    @GetMapping("/{id}")
+    public HttpEntity<?> getOneBook(@PathVariable Long id) {
+        return ResponseEntity.ok(bookService.getById(id));
+    }
+
+    @GetMapping("/search/{text}")
+    public HttpEntity<?> searchBook(@PathVariable String text) {
+        return ResponseEntity.ok(bookService.searchBook(text));
     }
 
 
@@ -53,12 +56,12 @@ public class BookController {
             @RequestParam("audioFile") @NotNull MultipartFile audioFile,
             @RequestParam("pdfBookFile") @NotNull MultipartFile pdfBookFile) {
         try {
-            if (!Objects.equals(audioFile.getContentType(), "audio/mpeg")) {
+            if (!Objects.equals(audioFile.getContentType(), "audio/mpeg"))
                 return new ResponseEntity<>("Invalid audio file type. Only MP3 is allowed.", HttpStatus.BAD_REQUEST);
-            }
-            if (!Objects.equals(pdfBookFile.getContentType(), "application/pdf")) {
+
+            if (!Objects.equals(pdfBookFile.getContentType(), "application/pdf"))
                 return new ResponseEntity<>("Invalid PDF file type. Only PDF is allowed.", HttpStatus.BAD_REQUEST);
-            }
+
             bookService.saveBook(bookName, authorName, type, bookCategoryId, audioFile, pdfBookFile);
             return new ResponseEntity<>("book", HttpStatus.CREATED);
         } catch (IOException e) {
