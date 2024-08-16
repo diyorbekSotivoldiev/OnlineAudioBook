@@ -37,6 +37,4 @@ public class Book {
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private PdfBook pdfBook;
-
-    private boolean active;
 }
