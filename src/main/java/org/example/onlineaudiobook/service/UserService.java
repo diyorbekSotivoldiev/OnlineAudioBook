@@ -25,7 +25,6 @@ public class UserService {
     private final CodesMailRepository codesMailRepository;
     private static final String EMAIL_REGEX = "^[\\w-\\.]+@[\\w-]+\\.[a-z]{2,}$";
 
-
     public static boolean isValidEmail(String email) {
         Pattern pattern = Pattern.compile(EMAIL_REGEX, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(email);
@@ -34,13 +33,14 @@ public class UserService {
 
     public User checkConfirmPasswordAndSendEmail(RegisterDto registerDto) {
         if (registerDto.password().equals(registerDto.confirmPassword())) {
+
             if (!isValidEmail(registerDto.email()))
                 throw new RuntimeException("email xato kiritildi");
             if (userRepository.existsByEmail(registerDto.email()))
                 throw new AlreadyExist("user EMAIL already exist");
-            if (userRepository.existsByPhone(registerDto.phone()))
+            if (registerDto.phone() != null && userRepository.existsByPhone(registerDto.phone()))
                 throw new AlreadyExist("user PHONE already exist");
-            if (userRepository.existsByUsername(registerDto.username()))
+            if (registerDto.username() != null && userRepository.existsByUsername(registerDto.username()))
                 throw new AlreadyExist("user USERNAME already exist");
 
             String code = String.valueOf(ThreadLocalRandom.current().nextInt(1000, 10000));

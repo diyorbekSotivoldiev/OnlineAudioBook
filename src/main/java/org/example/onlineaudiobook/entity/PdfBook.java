@@ -9,7 +9,6 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class PdfBook {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

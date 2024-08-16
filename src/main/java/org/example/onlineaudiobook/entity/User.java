@@ -26,17 +26,17 @@ public class User implements Serializable, UserDetails {
     private String email;
 
     private String displayName;
-    @Column(unique = true, nullable = false)
+
+    @Column(unique = true)
     private String username;
 
     @Column(nullable = false)
     @JsonIgnore
     private String password;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String phone;
 
-    @Column(nullable = false)
     private LocalDate birthDate;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -51,6 +51,6 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return active;
+        return this.active;
     }
 }

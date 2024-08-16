@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.example.onlineaudiobook.entity.*;
 import org.example.onlineaudiobook.entity.enums.BookType;
+import org.example.onlineaudiobook.projection.BookProjection;
 import org.example.onlineaudiobook.repository.*;
 import org.example.onlineaudiobook.requestDto.BookSaveRequest;
 import org.example.onlineaudiobook.responseDto.BookResponseDTO;
@@ -21,7 +22,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +41,7 @@ public class BookService {
     public List<BookResponseDTO> getAllBooks() {
         Sort sort = Sort.by(Sort.Direction.ASC, "createdAt");
         List<Book> books = bookRepository.findAll(sort);
-        return books.stream().map(this::convertToDto).collect(Collectors.toList());
+        return books.stream().map(this::convertToDto).toList();
     }
 
     private float calculateAverageMark(Book book) {
@@ -146,15 +146,28 @@ public class BookService {
         }
     }
 
+    public List<BookResponseDTO> getByCategoryId(Long categoryId) {
+        List<Book> allBooks = bookRepository.findAllByBookCategoryIdOrderByCreatedAt(categoryId);
+        return allBooks.stream().map(this::convertToDto).toList();
+    }
+
+    public BookResponseDTO getById(Long id) {
+        return convertToDto(bookRepository.findById(id).orElseThrow(() -> new RuntimeException("book not found")));
+    }
+
+    public List<BookProjection> searchBook(String text) {
+        return bookRepository.searchBook(text);
+    }
+
     public record Result(String fileName, String objUrl) {
     }
 
     public PdfBook getPdfOfBook(Long id) {
-        return bookRepository.findById(id).get().getPdfBook();
+        return bookRepository.findById(id).orElseThrow(() -> new RuntimeException("pdf of book not found")).getPdfBook();
     }
 
     public Audio getAudioByBookId(Long bookId) {
-        return bookRepository.findById(bookId).get().getAudio();
+        return bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("audio of book not found")).getAudio();
     }
 }
 
