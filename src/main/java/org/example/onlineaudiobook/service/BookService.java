@@ -72,9 +72,9 @@ public class BookService {
                 .author(book.getAuthorName())
                 .bookType(book.getType())
                 .category(book.getBookCategory())
-                .imageUrl(serverUrl+"api/book/image/"+book.getImage().getId())
-                .pdfUrl(book.getPdfBook().getUrl())
-                .audioUrl(book.getAudio().getUrl())
+                .imageUrl(serverUrl + "api/book/image/" + (book.getImage()==null?"0":book.getImage().getId()))
+                .pdfUrl(book.getPdfBook()==null?"":book.getPdfBook().getUrl())
+                .audioUrl(book.getAudio()==null?"":book.getAudio().getUrl())
                 .mark(calculateAverageMark(book))
                 .build();
     }

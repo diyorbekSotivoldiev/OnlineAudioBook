@@ -44,12 +44,5 @@ public class AudioController {
         return ResponseEntity.ok(audio);
     }
 
-    @GetMapping("/findByBookId/{bookId}")
-    public HttpEntity<?> getAudioByBookId(@PathVariable Long bookId) {
-        try {
-            return ResponseEntity.ok(bookService.getAudioByBookId(bookId));
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+
 }

@@ -3,7 +3,6 @@ package org.example.onlineaudiobook.controller;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.example.onlineaudiobook.entity.enums.BookType;
-import org.example.onlineaudiobook.repository.BookRepository;
 import org.example.onlineaudiobook.responseDto.BookResponseDTO;
 import org.example.onlineaudiobook.service.BookService;
 import org.springframework.http.HttpEntity;

@@ -10,6 +10,7 @@ import org.example.onlineaudiobook.repository.CodesMailRepository;
 import org.example.onlineaudiobook.requestDto.MailCodeDTO;
 import org.example.onlineaudiobook.requestDto.RegisterDto;
 import org.example.onlineaudiobook.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -33,14 +33,7 @@ public class PdfBookController {
     String serverUrl;
     private final PdfBookRepository pdfBookRepository;
 
-    @GetMapping("findByBookId/{bookId}")
-    public HttpEntity<?> getPdfFile(@PathVariable Long bookId) {
-        try {
-            return ResponseEntity.ok(bookService.getPdfOfBook(bookId));
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+
 
     @GetMapping("findByFileName/{fileName}")
     public HttpEntity<?> getFile(@PathVariable String fileName) {

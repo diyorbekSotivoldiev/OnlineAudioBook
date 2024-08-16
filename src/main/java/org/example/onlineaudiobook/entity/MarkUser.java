@@ -15,7 +15,7 @@ public class MarkUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne
+    @ManyToOne
     private User user;
     @Min(1)
     @Max(5)
