@@ -2,6 +2,7 @@ package org.example.onlineaudiobook.controller;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.example.onlineaudiobook.entity.Book;
 import org.example.onlineaudiobook.entity.enums.BookType;
 import org.example.onlineaudiobook.responseDto.BookResponseDTO;
 import org.example.onlineaudiobook.service.BookService;
@@ -61,8 +62,8 @@ public class BookController {
             if (!Objects.equals(pdfBookFile.getContentType(), "application/pdf"))
                 return new ResponseEntity<>("Invalid PDF file type. Only PDF is allowed.", HttpStatus.BAD_REQUEST);
 
-            bookService.saveBook(bookName, authorName, type, bookCategoryId, audioFile, pdfBookFile);
-            return new ResponseEntity<>("book", HttpStatus.CREATED);
+            Book book = bookService.saveBook(bookName, authorName, type, bookCategoryId, audioFile, pdfBookFile);
+            return new ResponseEntity<>("book " + book.getId() + " shu id bilan saqlandi!", HttpStatus.CREATED);
         } catch (IOException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (RuntimeException e) {

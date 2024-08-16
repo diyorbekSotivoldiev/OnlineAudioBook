@@ -1,14 +1,10 @@
 package org.example.onlineaudiobook.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.onlineaudiobook.entity.Audio;
 import org.example.onlineaudiobook.entity.PdfBook;
 import org.example.onlineaudiobook.repository.PdfBookRepository;
 import org.example.onlineaudiobook.service.BookService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,14 +29,13 @@ public class PdfBookController {
     private final PdfBookRepository pdfBookRepository;
 
 
-
     @GetMapping("findByFileName/{fileName}")
     public HttpEntity<?> getFile(@PathVariable String fileName) {
         Path path = Paths.get(fileBasePath + "pdfBookFile/" + fileName);
         if (!Files.exists(path)) {
             throw new RuntimeException("pdf file not found with the name: " + fileName);
         }
-        byte[] bytes = new byte[0];
+        byte[] bytes;
         try {
             bytes = Files.readAllBytes(path);
         } catch (IOException e) {

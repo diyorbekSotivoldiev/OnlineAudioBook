@@ -18,7 +18,7 @@ public class UserController {
     }
 
     @GetMapping("getAll")
-    public HttpEntity<?> getAll(){
+    public HttpEntity<?> getAll() {
         return ResponseEntity.ok(userRepository.findAll());
     }
 

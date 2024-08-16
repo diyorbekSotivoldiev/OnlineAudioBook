@@ -31,10 +31,10 @@ public class MarkService {
 
     public void saveNewMark(Long userId, Integer mark, Long bookId) {
         Rating rating = ratingRepository.findByBook_Id(bookId).orElse(null);
-        Book book = bookRepository.findById(bookId).get();
-        User user = userRepository.findById(userId).get();
+        Book book = bookRepository.findById(bookId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow();
         if (rating != null) {
-            Rating rating1 = ratingRepository.findByBook_Id(bookId).get();
+            Rating rating1 = ratingRepository.findByBook_Id(bookId).orElseThrow();
             MarkUser markUser = markUserRepository.save(new MarkUser(null, user, mark));
             rating1.getMarkUsers().add(markUser);
             ratingRepository.save(rating1);
