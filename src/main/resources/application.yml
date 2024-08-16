@@ -39,12 +39,18 @@ spring:
             max-file-size: 50MB
             max-request-size: 50MB
 
-#
-#    security:
-#        oauth2:
-#            client:
-#                registration:
-#                    google:
-#                        client-id: 84904511699-cjqrjg9bl4gtpl55sdt00v4o5qi9t9sh.apps.googleusercontent.com
-#                        client-secret: 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
-##                        redirect-uri: "{baseUrl}/login/oauth2/code/google"
+    security:
+        oauth2:
+            client:
+                registration:
+                    github:
+                        client-id: Ov23li6CV5LDHC6sBg94
+                        client-secret: ca88c0f57c60f1486e20dee3a69b84ea6e53634b
+                        redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+                        scope: read:user, user:email
+                        client-name: GitHub
+                provider:
+                    github:
+                        authorization-uri: https://github.com/login/oauth/authorize
+                        token-uri: https://github.com/login/oauth/access_token
+                        user-info-uri: https://api.github.com/user

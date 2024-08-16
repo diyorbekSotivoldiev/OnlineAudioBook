@@ -31,6 +31,8 @@ public class BookService {
     private final AudioRepository audioRepository;
     private final PdfBookRepository pdfBookRepository;
     private final BookCategoryRepository bookCategoryRepository;
+    private final PdfBookService pdfBookService;
+    private final ImageService imageService;
     @Value("${server.url}")
     String serverUrl;
     @Value("${file.basePath}")
@@ -56,8 +58,8 @@ public class BookService {
                 .sum();
 
         int count = (int) ratings.stream()
-                .flatMap(rating -> rating.getMarkUsers().stream())
-                .count();
+                .mapToLong(rating -> rating.getMarkUsers().size())
+                .sum();
 
         return (float) 1.0 * totalMarks / count;
     }
@@ -70,7 +72,9 @@ public class BookService {
                 .author(book.getAuthorName())
                 .bookType(book.getType())
                 .category(book.getBookCategory())
-                .image(book.getImage() != null ? book.getImage().getContent() : null)
+                .imageUrl(serverUrl+"api/book/image/"+book.getImage().getId())
+                .pdfUrl(book.getPdfBook().getUrl())
+                .audioUrl(book.getAudio().getUrl())
                 .mark(calculateAverageMark(book))
                 .build();
     }
@@ -79,20 +83,6 @@ public class BookService {
     public Book saveBook(String bookName, String authorName, BookType type, Long bookCategoryId, @NotNull MultipartFile audioData, @NotNull MultipartFile pdfData) throws IOException {
         BookSaveRequest bookSaveRequest = new BookSaveRequest(bookName, authorName, type, bookCategoryId);
         BookCategory bookCategory = bookCategoryRepository.findById(bookSaveRequest.getBookCategoryId()).orElseThrow(() -> new RuntimeException("BookCategory not found"));
-
-        Audio audio = null;
-        if (audioData != null && audioData.getInputStream().readAllBytes().length != 0) {
-            Result result = saveFile(audioData, "audioFile", serverUrl + "api/audio/findByFileName/");
-
-            audio = Audio
-                    .builder()
-                    .name(bookSaveRequest.getBookName())
-                    .fileName(result.fileName())
-                    .url(result.objUrl())
-                    .build();
-            audioRepository.save(audio);
-        }
-
         PdfBook pdfBook = null;
         if (pdfData != null && pdfData.getInputStream().readAllBytes().length != 0) {
             Result result = saveFile(pdfData, "pdfBookFile", serverUrl + "api/pdfBook/findByFileName/");
@@ -103,12 +93,30 @@ public class BookService {
                     .build();
             pdfBookRepository.save(pdfBook);
         }
+        Audio audio = null;
+        if (audioData != null && audioData.getInputStream().readAllBytes().length != 0) {
+            BookService.Result result = saveFile(audioData, "audioFile", serverUrl + "api/audio/findByFileName/");
+            audio = Audio
+                    .builder()
+                    .name(bookSaveRequest.getBookName())
+                    .fileName(result.fileName())
+                    .url(result.objUrl())
+                    .build();
+            audioRepository.save(audio);
+        }
 
+
+        byte[] firstPageOfPdf = pdfBookService.getFirstPageOfPdf(pdfData.getBytes());
+        Image image = null;
+        if (firstPageOfPdf != null && firstPageOfPdf.length != 0) {
+            image = imageService.saveImage(firstPageOfPdf);
+        }
         Book book = Book.builder()
                 .bookName(bookSaveRequest.getBookName())
                 .authorName(bookSaveRequest.getAuthorName())
                 .type(type)
                 .bookCategory(bookCategory)
+                .image(image)
                 .audio(audio)
                 .pdfBook(pdfBook)
                 .createdAt(LocalDateTime.now())
@@ -142,7 +150,7 @@ public class BookService {
         if (originalFilename != null && originalFilename.contains(".")) {
             return originalFilename.substring(originalFilename.lastIndexOf("."));
         } else {
-            throw new RuntimeException("invalid file"); // No extension found
+            throw new RuntimeException("invalid file");
         }
     }
 

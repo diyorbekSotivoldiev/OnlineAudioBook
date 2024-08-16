@@ -50,6 +50,11 @@ public class User implements Serializable, UserDetails {
     }
 
     @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
     public boolean isEnabled() {
         return active;
     }

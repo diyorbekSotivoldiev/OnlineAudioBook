@@ -68,7 +68,7 @@
 <body>
 <div class="container">
     <h1>Login</h1>
-    <form id="loginForm" action="/api/auth/login" method="post">
+    <form id="loginForm">
         <div class="form-group">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required>
@@ -83,14 +83,13 @@
         <div class="error" id="error-message">
         </div>
     </form>
-    <button id="google">sign with google</button>
+    <button id="google">Sign in with Google</button>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
 <script>
     function getQueryParams() {
-        const params = new URLSearchParams(window.location.search)
-        return Object.fromEntries(params.entries())
+        const params = new URLSearchParams(window.location.search);
+        return Object.fromEntries(params.entries());
     }
 
     const params = getQueryParams();
@@ -99,38 +98,40 @@
     if (accessToken && refreshToken) {
         localStorage.setItem("accessToken", "Bearer " + accessToken);
         localStorage.setItem("refreshToken", "Bearer " + refreshToken);
-        window.location.href = "index.html"
+        window.location.href = "index.html";
     }
-    document.getElementById('google').addEventListener(
-        'click', () => {
-            axios({
-                url: 'http://localhost:8081/api/auth/oauth2',
-                method: 'GET'
-            }).then(data => {
-                alert(data.data.authorizationUrl);
-                window.location.href = data.data.authorizationUrl;
-            })
-        }
-    )
+
+    document.getElementById('google').addEventListener('click', () => {
+        axios({
+            url: 'http://localhost:8081/api/auth/oauth2',
+            method: 'GET'
+        }).then(response => {
+            window.location.href = response.data.authorizationUrl;
+        }).catch(error => {
+            console.error('Error initiating OAuth2 login:', error);
+        });
+    });
+
     document.getElementById('loginForm').addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent default form submission
 
-        var form = event.target;
-        var formData = new FormData(form);
+        const form = event.target;
+        const formData = new FormData(form);
 
-        fetch(form.action, {
-            method: 'POST',
-            body: formData
-        }).then(response => {
-            if (response.ok) {
-                console.log('success login')
-                window.location.href = 'src/main/resources/templates/index.html';
-            } else {
-                document.getElementById('error-message').textContent = 'Invalid username or password.';
-            }
-        }).catch(error => {
-            // Handle fetch error
-            document.getElementById('error-message').textContent = 'An error occurred. Please try again.';
+        const data = {
+            username: formData.get('username'),
+            password: formData.get('password')
+        };
+
+        axios.post('http://localhost:8081/api/auth/login', data)
+            .then(response => {
+                const tokens = response.data;
+                localStorage.setItem("accessToken", "Bearer " + tokens.accessToken);
+                localStorage.setItem("refreshToken", "Bearer " + tokens.refreshToken);
+                window.location.href = 'index.html';
+            }).catch(error => {
+            document.getElementById('error-message').textContent = 'Invalid username or password.';
+            console.error('Error logging in:', error);
         });
     });
 </script>

@@ -10,6 +10,7 @@ import org.example.onlineaudiobook.repository.CodesMailRepository;
 import org.example.onlineaudiobook.requestDto.MailCodeDTO;
 import org.example.onlineaudiobook.requestDto.RegisterDto;
 import org.example.onlineaudiobook.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +25,7 @@ public class UserService {
     private final EmailService emailService;
     private final CodesMailRepository codesMailRepository;
     private static final String EMAIL_REGEX = "^[\\w-\\.]+@[\\w-]+\\.[a-z]{2,}$";
-
+    private final PasswordEncoder passwordEncoder;
 
     public static boolean isValidEmail(String email) {
         Pattern pattern = Pattern.compile(EMAIL_REGEX, Pattern.CASE_INSENSITIVE);
@@ -49,7 +50,7 @@ public class UserService {
                     .username(registerDto.username())
                     .displayName(registerDto.displayName())
                     .phone(registerDto.phone())
-                    .password(registerDto.password())
+                    .password(passwordEncoder.encode(registerDto.password()))
                     .birthDate(registerDto.dateOfBirth())
                     .email(registerDto.email()).build());
             codesMailRepository.deleteAllByUserId(save.getId());

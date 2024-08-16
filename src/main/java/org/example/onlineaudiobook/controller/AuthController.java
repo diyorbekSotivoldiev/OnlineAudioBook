@@ -55,6 +55,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public TokenDTO login(@RequestBody LoginRequestDTO loginRequestDTO) {
+        System.out.println(loginRequestDTO);
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getUsername(), loginRequestDTO.getPassword()));
         UserDetails userDetails = (UserDetails) authenticate.getPrincipal();
         String accessToken = jwtUtil.generateToken(userDetails);
@@ -81,7 +82,7 @@ public class AuthController {
         params.add("grant_type", "authorization_code");
         params.add("redirect_uri", redirectUri);
 
-        ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, params, Map.class);
+        var response = restTemplate.postForEntity(tokenUrl, params, Map.class);
         Map<String, String> tokens = response.getBody();
         String googleAccessToken = tokens.get("access_token");
         String email = fetchUserInfo(googleAccessToken);
@@ -94,7 +95,7 @@ public class AuthController {
 
         return ResponseEntity
                 .status(301)
-                .location(URI.create("http://localhost:63342/OnlineAudioBook/src/main/resources/templates/login.html?_ijt=vbv28tqimpa1iq77dqup9u5aen&_ij_reload=RELOAD_ON_SAVE&accessToken=" + accessToken + "&refreshToken=" + refreshToken))
+                .location(URI.create("http://localhost:63342/OnlineAudioBook/src/main/resources/templates/login.html?_ijt=vo5vb6sbn8gpsn6g691nach2n3&_ij_reload=RELOAD_ON_SAVE&accessToken=" + accessToken + "&refreshToken=" + refreshToken))
                 .build();
 
     }

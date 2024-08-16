@@ -33,8 +33,6 @@ public class Security {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(SWAGGER_URLS).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/book/**").permitAll()
-                        .requestMatchers("/api/register/**").permitAll()
                         .anyRequest().authenticated()
                 );
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);

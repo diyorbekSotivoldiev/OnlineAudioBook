@@ -17,6 +17,9 @@ public class BookResponseDTO {
     private String author;
     private BookType bookType;
     private BookCategory category;
-    private byte[] image;
+    private String imageUrl;
     private float mark;
+    private String audioUrl;
+    private String pdfUrl;
+
 }
