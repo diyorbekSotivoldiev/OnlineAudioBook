@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/edit")
+@RequestMapping("/api1/edit")
 public class SettingsController {
     private final SettingService settingService;
 

@@ -18,7 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @RestController
-@RequestMapping("/api/pdfBook")
+@RequestMapping("/api1/pdfBook")
 @RequiredArgsConstructor
 public class PdfBookController {
     private final BookService bookService;

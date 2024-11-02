@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/api/book")
+@RequestMapping("/api1/book")
 @RequiredArgsConstructor
 public class BookController {
     private final BookService bookService;
@@ -46,8 +46,18 @@ public class BookController {
     }
 
 
+    //
+//    @Operation(
+//            summary = "Create a new book",
+//            description = "This API allows you to upload a book with audio and PDF files",
+//            responses = {
+//                    @ApiResponse(responseCode = "201", description = "Book created"),
+//                    @ApiResponse(responseCode = "400", description = "Invalid file type or request error"),
+//                    @ApiResponse(responseCode = "404", description = "Book not found")
+//            }
+//    )
+    @PostMapping(value = "/create", consumes = "multipart/form-data")
     @Transactional
-    @PostMapping("/create")
     public HttpEntity<?> createBook(
             @RequestParam("bookName") String bookName,
             @RequestParam("authorName") String authorName,

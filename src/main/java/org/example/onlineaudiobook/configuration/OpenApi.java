@@ -1,9 +1,13 @@
-package org.example.onlineaudiobook.security;
+package org.example.onlineaudiobook.configuration;
+
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.info.License;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
 
 @OpenAPIDefinition(
@@ -12,7 +16,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
                         name = "Diyorbek",
                         email = "sotivoldievdiyorbek@gmail.com"
                 ),
-                description = "OnlineAudioBookAPIs documentation",
+                description = "OpenApi documentation for Hgp project",
                 title = "OpenApi specification",
                 version = "1.0",
                 license = @License(
@@ -23,8 +27,19 @@ import io.swagger.v3.oas.annotations.servers.Server;
         ),
         servers = @Server(
                 description = "Local En",
-                url = "http://localhost:8081"
+                url = "https://anvarovich.uz"
         )
+
+)
+@SecurityScheme(
+        name = "bearerAuth",
+        description = "JWT auth description",
+        scheme = "bearer",
+        type = SecuritySchemeType.HTTP,
+        bearerFormat = "JWT",
+        in = SecuritySchemeIn.HEADER
 )
 public class OpenApi {
+
 }
+

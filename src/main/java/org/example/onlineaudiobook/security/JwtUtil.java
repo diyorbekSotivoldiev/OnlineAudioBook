@@ -4,13 +4,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.stream.Collectors;
 
 @Service
 public class JwtUtil {
@@ -30,6 +28,7 @@ public class JwtUtil {
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7)) // one weeks expiration
                 .signWith(getKey()).compact();
     }
+
     public String generateToken(String email) {
         return Jwts.builder()
                 .subject(email)

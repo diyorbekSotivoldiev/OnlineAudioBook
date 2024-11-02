@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth/refresh/token")
+@RequestMapping("/api1/auth/refresh/token")
 @RequiredArgsConstructor
 public class RefreshTokenController {
     private final JwtUtil jwtUtil;

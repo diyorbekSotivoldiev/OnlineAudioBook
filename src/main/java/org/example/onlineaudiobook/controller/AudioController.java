@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
-@RequestMapping("/api/audio")
+@RequestMapping("/api1/audio")
 @RequiredArgsConstructor
 public class AudioController {
     @Value("${server.url}")

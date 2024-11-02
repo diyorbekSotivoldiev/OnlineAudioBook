@@ -30,7 +30,7 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 

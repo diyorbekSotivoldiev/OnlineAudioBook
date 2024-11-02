@@ -15,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/register")
+@RequestMapping("/api1/register")
 public class RegisterController {
     private final UserService userService;
 

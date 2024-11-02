@@ -114,7 +114,6 @@
         const audioFileInput = document.getElementById('audioFile');
         const audioList = document.getElementById('audioList');
         const audioPlayer = document.getElementById('audioPlayer');
-        const playBtn = document.getElementById('playBtn');
         const stopBtn = document.getElementById('stopBtn');
         const forwardBtn = document.getElementById('forwardBtn');
         const backwardBtn = document.getElementById('backwardBtn');
@@ -169,8 +168,7 @@
                     return response.blob();
                 })
                 .then(blob => {
-                    const audioUrl = URL.createObjectURL(blob);
-                    audioPlayer.src = audioUrl;
+                    audioPlayer.src = URL.createObjectURL(blob);
                     audioPlayer.style.display = 'block';
                     audioPlayer.play().catch(error => console.error('Error playing audio:', error));
                 })
