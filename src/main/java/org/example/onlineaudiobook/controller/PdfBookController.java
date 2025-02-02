@@ -5,10 +5,7 @@ import org.example.onlineaudiobook.entity.PdfBook;
 import org.example.onlineaudiobook.repository.PdfBookRepository;
 import org.example.onlineaudiobook.service.BookService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +23,7 @@ public class PdfBookController {
     String fileBasePath;
     @Value("${server.url}")
     String serverUrl;
-    private final PdfBookRepository pdfBookRepository;
+    //private final PdfBookRepository pdfBookRepository;
 
 
     @GetMapping("findByFileName/{fileName}")
@@ -43,14 +40,14 @@ public class PdfBookController {
         }
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, "application/pdf");
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; pdfOfBook=\"book.pdf\"");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"book.pdf\"");
         return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
     }
 
-    @PostMapping
-    public HttpEntity<?> save(@RequestBody MultipartFile file) {
-        BookService.Result result = bookService.saveFile(file, "pdfBookFile", serverUrl + "api/pdfBook/findByFileName/");
-        PdfBook pdfBook = pdfBookRepository.save(PdfBook.builder().url(result.objUrl()).fileName(result.fileName()).build());
-        return ResponseEntity.ok(pdfBook);
-    }
+//    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+//    public HttpEntity<?> save(@RequestBody MultipartFile file) {
+//        BookService.Result result = bookService.saveFile(file, "pdfBookFile", serverUrl + "api/pdfBook/findByFileName/");
+//        PdfBook pdfBook = pdfBookRepository.save(PdfBook.builder().url(result.objUrl()).fileName(result.fileName()).build());
+//        return ResponseEntity.ok(pdfBook);
+//    }
 }

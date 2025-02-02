@@ -35,12 +35,12 @@ public class AudioController {
         return new ResponseEntity<>(audioService.getAudio(fileName), headers, HttpStatus.OK);
     }
 
-    @PostMapping
+    /*@PostMapping
     public HttpEntity<?> save(@RequestBody MultipartFile file) {
         BookService.Result result = bookService.saveFile(file, "audioFile", serverUrl + "api/audio/findByFileName/");
         Audio audio = audioRepository.save(Audio.builder().name(file.getOriginalFilename()).url(result.objUrl()).fileName(result.fileName()).build());
         return ResponseEntity.ok(audio);
-    }
+    }*/
 
 
 }

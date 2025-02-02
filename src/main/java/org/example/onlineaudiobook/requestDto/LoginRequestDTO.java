@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class LoginRequestDTO {
-    private @NotNull @NotBlank String username;
+    private @NotNull @NotBlank String email;
     private @NotNull @NotBlank String password;
 }

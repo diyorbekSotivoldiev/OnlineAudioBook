@@ -2,6 +2,7 @@ package org.example.onlineaudiobook.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.onlineaudiobook.entity.User;
+import org.example.onlineaudiobook.entity.enums.Role;
 import org.example.onlineaudiobook.requestDto.MailCodeDTO;
 import org.example.onlineaudiobook.requestDto.RegisterDto;
 import org.example.onlineaudiobook.service.UserService;
@@ -26,6 +27,13 @@ public class RegisterController {
         return ResponseEntity.ok(user);
     }
 
+    @PostMapping("/byAdmin")
+    public HttpEntity<?> saveUserFromAdmin(@RequestBody RegisterDto registerDto, @RequestParam Role role) {
+        System.out.println(registerDto);
+        User user = userService.saveUserByAdmin(registerDto, role);
+        return ResponseEntity.ok(user);
+    }
+
     @PutMapping("/checkMailCode")
     public ResponseEntity<?> saveActiveUser(@RequestBody MailCodeDTO mailCodeDTO) {
         User user = userService.saveActiveUser(mailCodeDTO);
@@ -37,6 +45,6 @@ public class RegisterController {
     @PostMapping("/resendMail")
     public ResponseEntity<?> saveActiveUser(@RequestParam Long userId, @RequestParam String email) {
         userService.resendEmail(userId, email);
-        return ResponseEntity.ok(email+"ga kod yuborildi✔");
+        return ResponseEntity.ok(email + "ga kod yuborildi✔");
     }
 }

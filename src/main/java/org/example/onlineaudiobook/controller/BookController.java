@@ -3,10 +3,13 @@ package org.example.onlineaudiobook.controller;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.example.onlineaudiobook.entity.Book;
+import org.example.onlineaudiobook.entity.Image;
 import org.example.onlineaudiobook.entity.enums.BookType;
 import org.example.onlineaudiobook.responseDto.BookResponseDTO;
 import org.example.onlineaudiobook.service.BookService;
+import org.example.onlineaudiobook.service.ImageService;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,12 +25,23 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class BookController {
     private final BookService bookService;
+    private final ImageService imageService;
 
     @GetMapping("/getAll")
     public HttpEntity<?> getAllBooks() {
         List<BookResponseDTO> allBooks = bookService.getAllBooks();
 
         return ResponseEntity.ok(allBooks);
+    }
+
+    @GetMapping("/image/{id}")
+    public HttpEntity<?> getBookImage(@PathVariable Long id) {
+        Image image = imageService.getImageById(id);
+        byte[] bytes = image.getContent();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, "image/jpeg"); //Rasm turi, masalan JPEG uchun
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"image.jpg\""); //Faylni yuklab olishda taklif qilinadigan nom
+        return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
     }
 
     @GetMapping("/categoryId/{categoryId}")

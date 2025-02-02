@@ -21,9 +21,4 @@ public class UserController {
     public HttpEntity<?> getAll() {
         return ResponseEntity.ok(userRepository.findAll());
     }
-
-    @PostMapping("/logout")
-    public HttpEntity<?> logout() {
-        return ResponseEntity.ok("Mani ushbu xabarimni o'qishing bilan tokenni qayerda saqlab qoygan bo'lsang o'chir va tokenni berma endi, shunda user logout bo'ladi");
-    }
 }

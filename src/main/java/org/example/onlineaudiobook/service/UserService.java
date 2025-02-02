@@ -4,6 +4,7 @@ import io.jsonwebtoken.io.CodecException;
 import lombok.RequiredArgsConstructor;
 import org.example.onlineaudiobook.entity.CodesMail;
 import org.example.onlineaudiobook.entity.User;
+import org.example.onlineaudiobook.entity.enums.Role;
 import org.example.onlineaudiobook.handler.exceptions.AlreadyExist;
 import org.example.onlineaudiobook.handler.exceptions.PasswordMismatchException;
 import org.example.onlineaudiobook.repository.CodesMailRepository;
@@ -35,31 +36,38 @@ public class UserService {
 
     public User checkConfirmPasswordAndSendEmail(RegisterDto registerDto) {
         if (registerDto.password().equals(registerDto.confirmPassword())) {
-
-            if (!isValidEmail(registerDto.email()))
-                throw new RuntimeException("email xato kiritildi");
-            if (userRepository.existsByEmail(registerDto.email()))
-                throw new AlreadyExist("user EMAIL already exist");
-            if (registerDto.phone() != null && userRepository.existsByPhone(registerDto.phone()))
-                throw new AlreadyExist("user PHONE already exist");
-            if (registerDto.username() != null && userRepository.existsByUsername(registerDto.username()))
-                throw new AlreadyExist("user USERNAME already exist");
-
+            checkUserDetail(registerDto);
             String code = String.valueOf(ThreadLocalRandom.current().nextInt(1000, 10000));
             emailService.sendSimpleEmail(registerDto.email(), "Ushbu kodni hech kimga bermang", code);
-            User save = userRepository.save(User.builder()
-                    .username(registerDto.username())
-                    .displayName(registerDto.displayName())
-                    .phone(registerDto.phone())
-                    .password(passwordEncoder.encode(registerDto.password()))
-                    .birthDate(registerDto.dateOfBirth())
-                    .email(registerDto.email()).build());
+            User save = saveUser(registerDto);
             codesMailRepository.deleteAllByUserId(save.getId());
             codesMailRepository.save(new CodesMail(save, code));
             return save;
         } else {
             throw new PasswordMismatchException("password tasdiqlanmadi!");
         }
+    }
+
+    private void checkUserDetail(RegisterDto registerDto) {
+        if (!isValidEmail(registerDto.email()))
+            throw new RuntimeException("email xato kiritildi");
+        if (userRepository.existsByEmail(registerDto.email()))
+            throw new AlreadyExist("user EMAIL already exist");
+        if (registerDto.phone() != null && userRepository.existsByPhone(registerDto.phone()))
+            throw new AlreadyExist("user PHONE already exist");
+        if (registerDto.username() != null && userRepository.existsByUsername(registerDto.username()))
+            throw new AlreadyExist("user USERNAME already exist");
+    }
+
+    private User saveUser(RegisterDto registerDto) {
+        return userRepository.save(User.builder()
+                .username(registerDto.username())
+                .displayName(registerDto.displayName())
+                .phone(registerDto.phone())
+                .password(passwordEncoder.encode(registerDto.password()))
+                .birthDate(registerDto.dateOfBirth())
+                .role(Role.USER)
+                .email(registerDto.email()).build());
     }
 
     @Transactional
@@ -86,5 +94,14 @@ public class UserService {
         } catch (RuntimeException e) {
             throw new RuntimeException("kod yuborishda xatolik");
         }
+    }
+
+    public User saveUserByAdmin(RegisterDto registerDto, Role role) {
+        checkUserDetail(registerDto);
+        User user = saveUser(registerDto);
+        user.setActive(true);
+        user.setRole(role);
+        codesMailRepository.deleteAllByUserId(user.getId());
+        return userRepository.save(user);
     }
 }

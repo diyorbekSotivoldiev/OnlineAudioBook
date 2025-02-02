@@ -55,8 +55,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public TokenDTO login(@RequestBody LoginRequestDTO loginRequestDTO) {
-        System.out.println(loginRequestDTO);
-        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getUsername(), loginRequestDTO.getPassword()));
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequestDTO.getEmail(), loginRequestDTO.getPassword()));
+        System.out.println("successfully auth");
         UserDetails userDetails = (UserDetails) authenticate.getPrincipal();
         String accessToken = jwtUtil.generateToken(userDetails);
         String refreshToken = jwtUtil.generateRefreshToken(userDetails);
@@ -88,7 +88,7 @@ public class AuthController {
         String email = fetchUserInfo(googleAccessToken);
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isEmpty()){
-            userRepository.save(new User(null, email, "newUser", "newUser", passwordEncoder.encode("newPassword"), "phone", LocalDate.now(), null, true));
+            userRepository.save(new User(null, email, "newUser", "newUser", passwordEncoder.encode("newPassword"), "phone", LocalDate.now(),null, false,null));
         }
         String accessToken = jwtUtil.generateToken(email);
         String refreshToken = jwtUtil.generateRefreshToken(email);

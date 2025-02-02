@@ -3,12 +3,16 @@ package org.example.onlineaudiobook.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.onlineaudiobook.entity.enums.Role;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Getter
@@ -43,10 +47,12 @@ public class User implements Serializable, UserDetails {
     private Image image;
 
     private boolean active;
+    @Column(nullable = false) // Role null bo‘lishi mumkin emas
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return List.of(() -> role.name());
     }
 
     @Override

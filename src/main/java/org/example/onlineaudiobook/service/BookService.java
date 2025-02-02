@@ -72,7 +72,7 @@ public class BookService {
                 .author(book.getAuthorName())
                 .bookType(book.getType())
                 .category(book.getBookCategory())
-                .imageUrl(serverUrl + "api/book/image/" + (book.getImage() == null ? "0" : book.getImage().getId()))
+                .imageUrl(serverUrl + "api1/book/image/" + (book.getImage() == null ? "0" : book.getImage().getId()))
                 .pdfUrl(book.getPdfBook() == null ? "" : book.getPdfBook().getUrl())
                 .audioUrl(book.getAudio() == null ? "" : book.getAudio().getUrl())
                 .mark(calculateAverageMark(book))
@@ -85,7 +85,7 @@ public class BookService {
         BookCategory bookCategory = bookCategoryRepository.findById(bookSaveRequest.getBookCategoryId()).orElseThrow(() -> new RuntimeException("BookCategory not found"));
         PdfBook pdfBook = null;
         if (pdfData != null && pdfData.getInputStream().readAllBytes().length != 0) {
-            Result result = saveFile(pdfData, "pdfBookFile", serverUrl + "api/pdfBook/findByFileName/");
+            Result result = saveFile(pdfData, "pdfBookFile", serverUrl + "api1/pdfBook/findByFileName/");
             pdfBook = PdfBook
                     .builder()
                     .fileName(result.fileName)
@@ -95,7 +95,7 @@ public class BookService {
         }
         Audio audio = null;
         if (audioData != null && audioData.getInputStream().readAllBytes().length != 0) {
-            BookService.Result result = saveFile(audioData, "audioFile", serverUrl + "api/audio/findByFileName/");
+            BookService.Result result = saveFile(audioData, "audioFile", serverUrl + "api1/audio/findByFileName/");
             audio = Audio
                     .builder()
                     .name(bookSaveRequest.getBookName())

@@ -3,6 +3,7 @@ package org.example.onlineaudiobook.component;
 import lombok.RequiredArgsConstructor;
 import org.example.onlineaudiobook.entity.*;
 import org.example.onlineaudiobook.entity.enums.BookType;
+import org.example.onlineaudiobook.entity.enums.Role;
 import org.example.onlineaudiobook.repository.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -48,18 +49,19 @@ public class Runner implements CommandLineRunner {
             List<User> users = new ArrayList<>();
             for (int i = 0; i < 20; i++) {
                 users.add(userRepository.save(User.builder()
-                        .username(i % 2 == 0 ? "username%s".formatted(i) : null)
-                        .phone(i % 2 == 0 ? null : "phone" + i)
+                        .username("username%s".formatted(i))
+                        .phone("phone" + i)
                         .email("user%s@gmail.com".formatted(i))
-                        .displayName(i % 2 == 0 ? "John Doe%s".formatted(i) : null)
+                        .displayName("John Doe%s".formatted(i))
                         .password(passwordEncoder.encode("123"))
                         .birthDate(LocalDate.now())
                         .active(true)
+                        .role(i % 2 == 0 ? Role.USER : Role.ADMIN)
                         .build()));
             }
             Random random = new Random();
             for (Book book : books) {
-                if (book.getId()%3==0){
+                if (book.getId() % 3 == 0) {
                     Rating rating = ratingRepository.save(new Rating(null, new ArrayList<>(), book));
                     for (User user : users) {
                         MarkUser markUser = markUserRepository.save(new MarkUser(null, user, random.nextInt(1, 5)));

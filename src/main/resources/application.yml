@@ -5,7 +5,7 @@ spring:
         name: OnlineAudioBook
     datasource:
         driverClassName: org.postgresql.Driver
-        password: diyorbek
+        password: 2004
         url: jdbc:postgresql://localhost:5432/online_audio_book
         username: postgres
     jpa:
@@ -13,7 +13,7 @@ spring:
             ddl-auto: create
     mail:
         host: smtp.gmail.com
-        password: ibymzrmqglqafkew
+        password: mgpdxyjfkrknevvn
         port: 587
         properties:
             mail:

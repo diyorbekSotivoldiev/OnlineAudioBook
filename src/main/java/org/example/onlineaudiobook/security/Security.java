@@ -1,6 +1,8 @@
 package org.example.onlineaudiobook.security;
 
 import lombok.RequiredArgsConstructor;
+import org.example.onlineaudiobook.configuration.CustomCorsFilter;
+import org.example.onlineaudiobook.entity.enums.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,11 +21,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class Security {
     private final CustomUserDetailsService customUserDetailsService;
+    private final CustomCorsFilter corsFilter;
     private final String[] SWAGGER_URLS = {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
-            "/webjars/**","/api/**"
+            "/webjars/**"
     };
 
     @Bean
@@ -32,11 +35,19 @@ public class Security {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(SWAGGER_URLS).permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api1/auth/**",
+                                "/api1/register/resendMail",
+                                "/api1/register/checkMailCode",
+                                "/api1/any/register").permitAll()
+                        .requestMatchers(
+                                "/api1/book/create",
+                                "/api1/register/byAdmin",
+                                "/api1/user/**").hasAuthority(Role.ADMIN.name())
                         .anyRequest().authenticated()
                 );
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
         http.sessionManagement(m -> m.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
         http.userDetailsService(customUserDetailsService);
         return http.build();
     }

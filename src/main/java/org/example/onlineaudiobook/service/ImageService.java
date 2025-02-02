@@ -13,4 +13,8 @@ public class ImageService {
     public Image saveImage(byte[] firstPageOfPdf) {
         return imageRepository.save(new Image(null, firstPageOfPdf));
     }
+
+    public Image getImageById(Long id) {
+        return imageRepository.findById(id).orElseThrow();
+    }
 }
