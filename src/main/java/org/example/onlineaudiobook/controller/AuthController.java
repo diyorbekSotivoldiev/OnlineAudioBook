@@ -2,6 +2,7 @@ package org.example.onlineaudiobook.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.onlineaudiobook.entity.User;
+import org.example.onlineaudiobook.entity.enums.Role;
 import org.example.onlineaudiobook.repository.UserRepository;
 import org.example.onlineaudiobook.requestDto.LoginRequestDTO;
 import org.example.onlineaudiobook.requestDto.TokenDTO;
@@ -26,6 +27,7 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -83,24 +85,24 @@ public class AuthController {
         params.add("redirect_uri", redirectUri);
 
         var response = restTemplate.postForEntity(tokenUrl, params, Map.class);
-        Map<String, String> tokens = response.getBody();
-        String googleAccessToken = tokens.get("access_token");
+        Map tokens = response.getBody();
+        String googleAccessToken = (String) Objects.requireNonNull(tokens).get("access_token");
         String email = fetchUserInfo(googleAccessToken);
         Optional<User> optionalUser = userRepository.findByEmail(email);
-        if (optionalUser.isEmpty()){
-            userRepository.save(new User(null, email, "newUser", "newUser", passwordEncoder.encode("newPassword"), "phone", LocalDate.now(),null, false,null));
+        if (optionalUser.isEmpty()) {
+            userRepository.save(new User(null, email, "newUser", "newUser", passwordEncoder.encode("newPassword"), "phone", LocalDate.now(), null, false, Role.USER));
         }
         String accessToken = jwtUtil.generateToken(email);
         String refreshToken = jwtUtil.generateRefreshToken(email);
-
         return ResponseEntity
                 .status(301)
                 .location(URI.create("http://localhost:63342/OnlineAudioBook/src/main/resources/templates/login.html?_ijt=vo5vb6sbn8gpsn6g691nach2n3&_ij_reload=RELOAD_ON_SAVE&accessToken=" + accessToken + "&refreshToken=" + refreshToken))
                 .build();
 
+
     }
 
-    private String fetchUserInfo(String googleAccessToken) {
+    private String fetchUserInfo (String googleAccessToken) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("Authorization", "Bearer " + googleAccessToken);

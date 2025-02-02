@@ -151,18 +151,37 @@
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-<script>
-    axios({
-        url: "http://localhost:8081/api/book",
-        method: "GET",
-        headers: {
-            "Authorization":localStorage.getItem("accessToken")
-        }
-    })
-        .then(res=>{
-            document.getElementById("res").innerText = res.data;
-        })
 
+<script>
+    // Function to get URL parameters
+    function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    // Get access token from URL
+    const accessToken = getQueryParam("accessToken");
+
+    if (!accessToken) {
+        // Redirect to login page if no access token is found
+        window.location.href = "src/main/resources/templates/login.html";
+    } else {
+        document.getElementById("res").innerText = "logined";
+
+        axios({
+            url: "http://localhost:8081/api1/book/getAll",
+            method: "GET",
+            headers: {
+                "Authorization": accessToken
+            }
+        })
+            .then(res => {
+                document.getElementById("res").innerText = res.data;
+            })
+            .catch(error => {
+                console.error("Error fetching books:", error);
+            });
+    }
 </script>
 
 </body>

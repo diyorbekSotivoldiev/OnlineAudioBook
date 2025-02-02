@@ -103,7 +103,7 @@
 
     document.getElementById('google').addEventListener('click', () => {
         axios({
-            url: 'http://localhost:8081/api/auth/oauth2',
+            url: 'http://localhost:8081/api1/auth/oauth2',
             method: 'GET'
         }).then(response => {
             window.location.href = response.data.authorizationUrl;

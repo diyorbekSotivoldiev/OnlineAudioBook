@@ -47,7 +47,6 @@ public class Security {
                 );
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
         http.sessionManagement(m -> m.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
         http.userDetailsService(customUserDetailsService);
         return http.build();
     }
